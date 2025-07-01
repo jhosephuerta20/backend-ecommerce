@@ -1,0 +1,83 @@
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const Usuario = require("../models/autenticacionModel");
+
+const registrar = async (req, res) => {
+  const { nombre, correo, rol, contrasena } = req.body;
+  try {
+    const existente = await Usuario.buscarPorCorreo(correo);
+    if (existente) {
+      return res.status(400).json({ error: "El correo ya está registrado" });
+    }
+
+    const contrasenaHasheada = await bcrypt.hash(contrasena, 10);
+    const nuevo = await Usuario.crearUsuario(
+      nombre,
+      correo,
+      rol,
+      contrasenaHasheada
+    );
+
+    res.status(201).json({
+      mensaje: "Usuario registrado correctamente",
+      usuario: {
+        id: nuevo.id,
+        nombre: nuevo.nombre,
+        correo: nuevo.correo,
+        rol: nuevo.rol,
+      },
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error en el registro", detalle: error.message });
+  }
+};
+
+const iniciarSesion = async (req, res) => {
+  const { correo, contrasena } = req.body;
+  try {
+    const usuario = await Usuario.buscarPorCorreo(correo);
+    if (!usuario) {
+      return res.status(404).json({ error: "Correo no registrado" });
+    }
+
+    const coincide = await bcrypt.compare(contrasena, usuario.contrasena);
+    if (!coincide) {
+      return res.status(401).json({ error: "Contraseña incorrecta" });
+    }
+
+    const token = jwt.sign({ id: usuario.id }, process.env.JWT_SECRET, {
+      expiresIn: "2h",
+    });
+
+    res.json({ token });
+    console.log("parametros", usuario);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al iniciar sesión", detalle: error.message });
+    console.log("parametros", Usuario);
+  }
+};
+
+const obtenerPerfil = async (req, res) => {
+  const id = req.usuarioId;
+  try {
+    const usuario = await Usuario.buscarPorId(id);
+    if (!usuario) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+    res.json({ perfil: usuario });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al obtener perfil", detalle: error.message });
+  }
+};
+
+module.exports = {
+  registrar,
+  iniciarSesion,
+  obtenerPerfil,
+};
