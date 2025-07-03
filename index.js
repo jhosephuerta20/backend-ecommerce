@@ -6,6 +6,7 @@ const db = require("./src/config/db");
 const rutasAutenticacion = require("./src/routes/autenticacionRoutes");
 const rutasCategorias = require("./src/routes/categoriasRoutes");
 const rutasLibros = require("./src/routes/libroRoutes");
+const rutasAutor = require("./src/routes/autorRoutes");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/auth", rutasAutenticacion);
 app.use("/categorias", rutasCategorias);
 app.use("/libro", rutasLibros);
+app.use("/autor", rutasAutor);
 
 app.get("/test-db", async (req, res) => {
   try {

@@ -52,12 +52,10 @@ const iniciarSesion = async (req, res) => {
     });
 
     res.json({ token });
-    console.log("parametros", usuario);
   } catch (error) {
     res
       .status(500)
       .json({ error: "Error al iniciar sesión", detalle: error.message });
-    console.log("parametros", Usuario);
   }
 };
 

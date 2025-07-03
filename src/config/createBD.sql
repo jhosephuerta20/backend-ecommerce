@@ -2,29 +2,29 @@ CREATE DATABASE bookstore;
 \c bookstore;
 
 -- Tabla Autores
-CREATE TABLE Autores (
+CREATE TABLE autor (
     id SERIAL PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL
+    nombre VARCHAR(50) NOT NULL,
+    url_foto TEXT,
 );
 
 -- Tabla Categorias
-CREATE TABLE Categorias (
+CREATE TABLE categorias (
     id SERIAL PRIMARY KEY,
-    id_libros INTEGER
+    categoria VARCHAR (70) NOT NULL
 );
 
 -- Tabla Libros
-CREATE TABLE Libros (
+CREATE TABLE libros (
     id SERIAL PRIMARY KEY,
     isbn VARCHAR(20),
     titulo VARCHAR(255),
     descripcion TEXT,
     precio DECIMAL(10,2),
     url_portada TEXT,
-    rl_libro TEXT,
+    url_libro TEXT,
     id_categoria INTEGER REFERENCES Categorias(id),
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW();
+    
 );
 id_autor INTEGER REFERENCES Autores(id),
 -- Tabla Resenas
@@ -67,12 +67,14 @@ CREATE TABLE Pago (
 );
 
 -- Tabla Usuarios
-CREATE TABLE Usuarios (
+CREATE TABLE usuarios (
     id SERIAL PRIMARY KEY,
-    nombre VARCHAR(100),
-    rol VARCHAR(50),
+    nombre VARCHAR(100),  
     correo VARCHAR(100),
-    contrasena VARCHAR(255)
+    contrasena VARCHAR(255),
+    rol VARCHAR(50),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Tabla Favoritos

@@ -8,6 +8,7 @@ const registrar = async (req, res) => {
     url_portada,
     url_libro,
     id_categoria,
+    id_autor,
   } = req.body;
   try {
     const existente = await Libros.buscarPorIsbn(isbn);
@@ -22,7 +23,8 @@ const registrar = async (req, res) => {
       precio,
       url_portada,
       url_libro,
-      id_categoria
+      id_categoria,
+      id_autor
     );
 
     res.status(201).json({
@@ -35,6 +37,7 @@ const registrar = async (req, res) => {
         url_portada: nuevo.url_portada,
         url_libro: nuevo.url_libro,
         id_categoria: nuevo.id_categoria,
+        id_autor: nuevo.id_autor,
       },
     });
   } catch (error) {
@@ -44,6 +47,36 @@ const registrar = async (req, res) => {
   }
 };
 
+const listarLibros = async (req, res) => {
+  try {
+    resultado = await Libros.listarLibros();
+    res.status(200);
+    res.json({ libros: resultado });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al listar libros", detalle: error.message });
+  }
+};
+
+const obtenerLibro = async (req, res) => {
+  const { id } = req.params;
+  try {
+    resultado = await Libros.libroPorId(id);
+    if (!resultado) {
+      res.json({ resultado: "Libro no registrado" });
+    } else {
+      res.status(200);
+      res.json({ libro: resultado });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al buscar libro", detalle: error.message });
+  }
+};
 module.exports = {
   registrar,
+  listarLibros,
+  obtenerLibro,
 };
