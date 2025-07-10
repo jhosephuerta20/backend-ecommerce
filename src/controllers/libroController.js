@@ -1,4 +1,5 @@
 const Libros = require("../models/libroModel");
+
 const registrar = async (req, res) => {
   const {
     isbn,
@@ -75,8 +76,67 @@ const obtenerLibro = async (req, res) => {
       .json({ error: "Error al buscar libro", detalle: error.message });
   }
 };
+
+const actualizarLibro = async (req, res) => {
+  const { id } = req.params;
+  const {
+    isbn,
+    titulo,
+    descripcion,
+    precio,
+    url_portada,
+    url_libro,
+    id_categoria,
+    id_autor,
+  } = req.body;
+
+  console.log(isbn, id);
+  try {
+    resultado = await Libros.actualizarLibro(
+      isbn,
+      titulo,
+      descripcion,
+      precio,
+      url_portada,
+      url_libro,
+      id_categoria,
+      id_autor,
+      id
+    );
+    res.json({ libro: resultado });
+    console.log(resultado);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al actualizar", detalle: error.message });
+  }
+  console.log(resultado);
+};
+
+const eliminarLibro = async (req, res) => {
+  const { id } = req.params;
+  try {
+    resultado = await Libros.eliminarLibro(id);
+    res.json("libro eliminado");
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al eliminar ", detalle: error.message });
+  }
+};
+
+const filtroLibro = async (req, res) => {
+  const { titulo } = req.body;
+  try {
+    const resultado = await Libros.filtroLibro(titulo);
+    res.json(libro);
+  } catch (error) {}
+};
 module.exports = {
   registrar,
   listarLibros,
   obtenerLibro,
+  actualizarLibro,
+  eliminarLibro,
+  filtroLibro,
 };

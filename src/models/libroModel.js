@@ -42,9 +42,51 @@ const libroPorId = async (id) => {
   return resultado.rows[0];
 };
 
+const actualizarLibro = async (
+  isbn,
+  titulo,
+  descripcion,
+  precio,
+  url_portada,
+  url_libro,
+  id_categoria,
+  id_autor,
+  id
+) => {
+  const query = `UPDATE libros SET isbn = $1,titulo = $2,descripcion = $3,precio = $4,url_portada = $5,url_libro = $6,id_categoria = $7,id_autor = $8 WHERE id = $9
+  RETURNING *`;
+  const resultado = await pool.query(query, [
+    isbn,
+    titulo,
+    descripcion,
+    precio,
+    url_portada,
+    url_libro,
+    id_categoria,
+    id_autor,
+    id,
+  ]);
+  return resultado.rows;
+};
+
+const eliminarLibro = async (id) => {
+  const query = `DELETE FROM libros where id = $1`;
+  const resultado = await pool.query(query, [id]);
+  return resultado.rows[0];
+};
+
+const filtroLibro = async (titulo) => {
+  const query = `SELECT * FROM libros WHERE titulo = $1 `;
+  const resultado = await pool.query(query, [titulo]);
+  return resultado.rows;
+};
+
 module.exports = {
   registrar,
   buscarPorIsbn,
   listarLibros,
   libroPorId,
+  actualizarLibro,
+  eliminarLibro,
+  filtroLibro,
 };

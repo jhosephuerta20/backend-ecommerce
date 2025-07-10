@@ -8,5 +8,7 @@ router.post("/crear", controlador.registrar);
 //rutas usuario cliente
 router.get("/listar", controlador.listarLibros);
 router.get("/:id", controlador.obtenerLibro);
+router.put("/:id", controlador.actualizarLibro);
+router.delete("/:id", controlador.eliminarLibro);
 
 module.exports = router;
