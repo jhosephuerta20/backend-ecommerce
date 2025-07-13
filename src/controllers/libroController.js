@@ -14,7 +14,7 @@ const registrar = async (req, res) => {
   try {
     const existente = await Libros.buscarPorIsbn(isbn);
     if (existente) {
-      return res.status(400).json({ error: "EL libro ya está registrado" });
+      return res.status(409).json({ error: "EL libro ya está registrado" });
     }
 
     const nuevo = await Libros.registrar(
@@ -30,16 +30,6 @@ const registrar = async (req, res) => {
 
     res.status(201).json({
       mensaje: "Libro registrado correctamente",
-      libro: {
-        isbn: nuevo.isbn,
-        titulo: nuevo.titulo,
-        descripcion: nuevo.descripcion,
-        precio: nuevo.precio,
-        url_portada: nuevo.url_portada,
-        url_libro: nuevo.url_libro,
-        id_categoria: nuevo.id_categoria,
-        id_autor: nuevo.id_autor,
-      },
     });
   } catch (error) {
     res
