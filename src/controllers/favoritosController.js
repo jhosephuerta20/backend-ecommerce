@@ -41,13 +41,13 @@ const listarFavoritos = async (req, res) => {
 
 const eliminarFavorito = async (req, res) => {
   const { id } = req.params;
-  console.log("Usuario id:", id_libro);
-  console.log(id_usuario);
-
   try {
     const eliminarFavoritos = await Favoritos.eliminar(id);
     res.status(200);
-    res.json({ favoritos: eliminarFavoritos });
+    res.json({
+      message: "libro eliminado de favorito",
+      id,
+    });
   } catch (error) {
     res
       .status(500)

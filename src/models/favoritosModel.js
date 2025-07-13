@@ -40,9 +40,9 @@ const listar = async (id_usuario) => {
   return resultado.rows;
 };
 
-const eliminar = async (id_usuario, id_libro) => {
+const eliminar = async (id) => {
   const query = `DELETE FROM favoritos WHERE id = $1  RETURNING *`;
-  const resultado = await pool.query(query, [id_usuario, id_libro]);
+  const resultado = await pool.query(query, [id]);
   return resultado.rows;
 };
 
