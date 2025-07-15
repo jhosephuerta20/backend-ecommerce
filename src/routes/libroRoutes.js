@@ -12,4 +12,6 @@ router.delete("/:id", verificarToken, controlador.eliminarLibro);
 router.get("/listar", controlador.listarLibros);
 router.get("/:id", controlador.obtenerLibro);
 
+router.get("/catalogo/completo", controlador.catalogo);
+
 module.exports = router;

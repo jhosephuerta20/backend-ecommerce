@@ -11,7 +11,7 @@ CREATE TABLE autor (
 -- Tabla Categorias
 CREATE TABLE categorias (
     id SERIAL PRIMARY KEY,
-    categoria VARCHAR (70) NOT NULL
+    nombreCat VARCHAR (70) NOT NULL
 );
 
 -- Tabla Libros
@@ -24,22 +24,23 @@ CREATE TABLE libros (
     url_portada TEXT,
     url_libro TEXT,
     id_categoria INTEGER REFERENCES Categorias(id),
-    
+    id_autor INTEGER REFERENCES autor(id),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-id_autor INTEGER REFERENCES Autores(id),
+
 -- Tabla Resenas
-CREATE TABLE Resenas (
+CREATE TABLE resenas (
     id SERIAL PRIMARY KEY,
     calificacion INTEGER,
-    id_libro INTEGER REFERENCES Libros(id),
-    id_comentario INTEGER,
-    id_usuario INTEGER REFERENCES Usuarios(id) -- esta referencia estará en la tabla Usuarios
+    id_libro INTEGER REFERENCES libros(id),
+    id_usuario INTEGER REFERENCES usuarios(id) 
 );
 
 -- Tabla Ventas
-CREATE TABLE Ventas (
-    id_ventas SERIAL PRIMARY KEY,
-    id_usuario INTEGER REFERENCES Usuarios(id),
+CREATE TABLE ventas (
+    id SERIAL PRIMARY KEY,
+    id_usuario INTEGER REFERENCES usuarios(id),
     cantidad_total INTEGER,
     total_pagar DECIMAL(10,2),
     subtotal DECIMAL(10,2),
@@ -49,8 +50,8 @@ CREATE TABLE Ventas (
 
 -- Tabla Detalle_venta
 CREATE TABLE Detalle_venta (
-    id_ventas INTEGER REFERENCES Ventas(id),
-    id_libro INTEGER REFERENCES Libros(id),
+    id_ventas INTEGER REFERENCES ventas(id),
+    id_libro INTEGER REFERENCES libros(id),
     cantidad INTEGER,
     precio_unitario DECIMAL(10,2),
     PRIMARY KEY (id_ventas, id_libro)
@@ -64,6 +65,8 @@ CREATE TABLE Pago (
     estado VARCHAR(50),
     payment_id VARCHAR(100),
     tipo_pago VARCHAR(50)
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Tabla Usuarios
@@ -78,16 +81,16 @@ CREATE TABLE usuarios (
 );
 
 -- Tabla Favoritos
-CREATE TABLE Favoritos (
+CREATE TABLE favoritos (
     id SERIAL PRIMARY KEY,
-    id_usuario INTEGER REFERENCES Usuarios(id),
-    id_libro INTEGER REFERENCES Libros(id)
+    id_usuario INTEGER REFERENCES usuarios(id),
+    id_libro INTEGER REFERENCES libros(id)
 );
 
 -- Tabla Comentarios
-CREATE TABLE Comentarios (
+CREATE TABLE comentarios (
     id SERIAL PRIMARY KEY,
     comentario TEXT,
-    id_usuario INTEGER REFERENCES Usuarios(id),
-    id_libro INTEGER REFERENCES Libros(id)
+    id_usuario INTEGER REFERENCES usuarios(id),
+    id_libro INTEGER REFERENCES libros(id)
 );

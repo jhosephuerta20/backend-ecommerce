@@ -122,6 +122,87 @@ const filtroLibro = async (req, res) => {
     res.json(libro);
   } catch (error) {}
 };
+
+//LIBROS PARA CATALOGO CON TODA LA INFORMACION COMPLETA
+
+const catalogo = async (req, res) => {
+  try {
+    const data = await Libros.obtenerCatalogo();
+
+    const catalogoMap = new Map();
+
+    for (const row of data) {
+      const {
+        libro_id,
+        titulo,
+        descripcion,
+        precio,
+        nombre_categoria,
+        nombre_autor,
+        resena_id,
+        calificacion,
+        resena_usuario_id,
+        nombre_usuario_resena,
+        comentario_id,
+        comentario,
+        comentario_usuario_id,
+        nombre_usuario_comentario,
+      } = row;
+
+      if (!catalogoMap.has(libro_id)) {
+        catalogoMap.set(libro_id, {
+          id: libro_id,
+          titulo,
+          descripcion,
+          precio,
+          categoria: nombre_categoria,
+          autor: nombre_autor,
+          resenas: [],
+          comentarios: [],
+        });
+      }
+
+      const libro = catalogoMap.get(libro_id);
+
+      // Añadir reseña si existe
+      if (resena_id && !libro.resenas.some((r) => r.id === resena_id)) {
+        libro.resenas.push({
+          id: resena_id,
+          calificacion,
+          usuario: {
+            id: resena_usuario_id,
+            nombre: nombre_usuario_resena,
+          },
+        });
+      }
+
+      // Añadir comentario si existe
+      if (
+        comentario_id &&
+        !libro.comentarios.some((c) => c.id === comentario_id)
+      ) {
+        libro.comentarios.push({
+          id: comentario_id,
+          comentario,
+          usuario: {
+            id: comentario_usuario_id,
+            nombre: nombre_usuario_comentario,
+          },
+        });
+      }
+    }
+
+    const resultado = Array.from(catalogoMap.values());
+
+    res.json(resultado);
+  } catch (error) {
+    res.status(500).json({
+      error: "Error en la lista de catálogo",
+      detalle: error.message,
+    });
+  }
+};
+
 module.exports = {
   registrar,
   listarLibros,
@@ -129,4 +210,5 @@ module.exports = {
   actualizarLibro,
   eliminarLibro,
   filtroLibro,
+  catalogo,
 };

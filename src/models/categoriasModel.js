@@ -1,13 +1,13 @@
 const pool = require("../config/db");
 
 const registrar = async (categoria) => {
-  const query = `INSERT INTO categorias (categoria) VALUES ($1) RETURNING *`;
+  const query = `INSERT INTO categorias (nombreCat) VALUES ($1) RETURNING *`;
   const resultado = await pool.query(query, [categoria]);
   return resultado.rows[0];
 };
 
 const buscarPorCategoria = async (categoria) => {
-  const query = `SELECT * FROM categorias WHERE categoria = $1`;
+  const query = `SELECT * FROM categorias WHERE nombreCat = $1`;
   const resultado = await pool.query(query, [categoria]);
   return resultado.rows[0];
 };
@@ -19,7 +19,7 @@ const listarCategorias = async () => {
 };
 
 const listarCategoriasLibros = async () => {
-  const query = `SELECT c.id,categoria, jsonb_agg(l.*) AS libros FROM categorias c LEFT JOIN libros l ON c.id = l.id_categoria GROUP BY c.id;`;
+  const query = `SELECT c.id,nombreCat, jsonb_agg(l.*) AS libros FROM categorias c LEFT JOIN libros l ON c.id = l.id_categoria GROUP BY c.id;`;
   const resultado = await pool.query(query);
   return resultado.rows;
 };
@@ -31,7 +31,7 @@ const obtenerCategoria = async (id) => {
 };
 
 const actualizarCategoria = async (idCategoria, categoria) => {
-  const query = `UPDATE categorias SET categoria = $1 WHERE id = $2 RETURNING *`;
+  const query = `UPDATE categorias SET nombreCat = $1 WHERE id = $2 RETURNING *`;
   const resultado = await pool.query(query, [categoria, idCategoria]);
   return resultado.rows;
 };
