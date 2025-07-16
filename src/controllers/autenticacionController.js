@@ -51,11 +51,12 @@ const iniciarSesion = async (req, res) => {
       expiresIn: "2h",
     });
 
-    res.json({ token });
+    res.json({ token, id: usuario.id });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error al iniciar sesión", detalle: error.message });
+    res.status(500).json({
+      error: "Error al iniciar sesión",
+      detalle: error.message,
+    });
   }
 };
 

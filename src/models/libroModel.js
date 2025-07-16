@@ -88,6 +88,8 @@ const obtenerCatalogo = async () => {
       l.titulo,
       l.descripcion,
       l.precio,
+      l.url_portada,
+      l.url_libro,
       l.id_categoria,
       c.nombreCat AS nombre_categoria,
       l.id_autor,
