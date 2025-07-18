@@ -1,40 +1,102 @@
 const Libros = require("../models/libroModel");
+const subirImagen = require("../utils/subirImagen");
+const subirPDF = require("../utils/subirPDF");
 
+// const registrar = async (req, res) => {
+//   const {
+//     isbn,
+//     titulo,
+//     descripcion,
+//     precio,
+//     url_portada,
+//     url_libro,
+//     id_categoria,
+//     id_autor,
+//   } = req.body;
+
+//   try {
+//     let local_url = url_portada;
+//     let libro_local = url_libro;
+//     if (req.file) {
+//       const mimeType = req.file.mimetype;
+
+//       if (mimeType.includes("image")) {
+//         local_url = await subirImagen(req.file.buffer);
+//       } else if (mimeType.includes("pdf")) {
+//         libro_local = await subirPDF(req.file.buffer);
+//       } else {
+//         return res.status(400).json({ error: "Tipo de archivo no soportado" });
+//       }
+//     }
+//     console.log("url_imagen", local_url);
+//     console.log("url_libro", libro_local);
+
+//     const existente = await Libros.buscarPorIsbn(isbn);
+//     if (existente) {
+//       return res.status(409).json({ error: "El libro ya está registrado" });
+//     }
+//     const nuevo = await Libros.registrar(
+//       isbn,
+//       titulo,
+//       descripcion,
+//       precio,
+//       local_url,
+//       libro_local,
+//       id_categoria,
+//       id_autor
+//     );
+
+//     res.status(201).json({ libro: nuevo });
+//   } catch (error) {
+//     res.status(500).json({
+//       error: "Error en el registro",
+//       detalle: error.message,
+//     });
+//   }
+// };
 const registrar = async (req, res) => {
-  const {
-    isbn,
-    titulo,
-    descripcion,
-    precio,
-    url_portada,
-    url_libro,
-    id_categoria,
-    id_autor,
-  } = req.body;
+  const { isbn, titulo, descripcion, precio, id_categoria, id_autor } =
+    req.body;
+
   try {
-    const existente = await Libros.buscarPorIsbn(isbn);
-    if (existente) {
-      return res.status(409).json({ error: "EL libro ya está registrado" });
+    // Inicializa con valores opcionales si no se suben archivos
+    let local_url = req.body.url_portada || "";
+    let libro_local = req.body.url_libro || "";
+
+    // Subir imagen si fue enviada
+    if (req.files?.url_portada?.[0]) {
+      local_url = await subirImagen(req.files.url_portada[0].buffer);
     }
 
+    // Subir PDF si fue enviado
+    if (req.files?.url_libro?.[0]) {
+      libro_local = await subirPDF(req.files.url_libro[0].buffer);
+    }
+
+    // Verifica si ya existe
+    const existente = await Libros.buscarPorIsbn(isbn);
+    if (existente) {
+      return res.status(409).json({ error: "El libro ya está registrado" });
+    }
+
+    // Registrar libro
     const nuevo = await Libros.registrar(
       isbn,
       titulo,
       descripcion,
       precio,
-      url_portada,
-      url_libro,
+      local_url,
+      libro_local,
       id_categoria,
       id_autor
     );
 
-    res.status(201).json({
-      mensaje: "Libro registrado correctamente",
-    });
+    res.status(201).json({ libro: nuevo });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error en el registro", detalle: error.message });
+    res.status(500).json({
+      error: "Error en el registro",
+      detalle: error.message,
+    });
   }
 };
 

@@ -1,10 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const controlador = require("../controllers/libroController");
-//const verificarToken = require("../middlewares/verificarToken");
+const upload = require("../middlewares/multer");
 
-//rutas admin
-router.post("/crear", controlador.registrar);
+router.post(
+  "/crear",
+  upload.fields([
+    { name: "url_portada", maxCount: 1 },
+    { name: "url_libro", maxCount: 1 },
+  ]),
+  controlador.registrar
+);
+
 router.put("/:id", controlador.actualizarLibro);
 router.delete("/:id", controlador.eliminarLibro);
 

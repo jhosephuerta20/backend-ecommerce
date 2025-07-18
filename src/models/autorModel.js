@@ -18,8 +18,30 @@ const listarAutores = async () => {
   return resultado.rows;
 };
 
+const updateAutor = async (nombre, url_foto, id) => {
+  const query =
+    "UPDATE autor SET nombre = $1, url_foto = $2 WHERE id = $3 RETURNING *";
+  const resultado = await pool.query(query, [nombre, url_foto, id]);
+  return resultado.rows;
+};
+
+const deleteAutor = async (id) => {
+  const query = "DELETE FROM autor WHERE id = $1 RETURNING *";
+  const resultado = await pool.query(query, [id]);
+  return resultado.rows;
+};
+
+const obtenerIdAutor = async (id) => {
+  const query = `SELECT * from autor WHERE id = $1`;
+  const resultado = await pool.query(query, [id]);
+  return resultado.rows[0];
+};
+
 module.exports = {
   registrar,
   buscarPorAutor,
   listarAutores,
+  updateAutor,
+  deleteAutor,
+  obtenerIdAutor,
 };
