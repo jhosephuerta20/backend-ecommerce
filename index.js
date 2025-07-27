@@ -10,6 +10,7 @@ const rutasAutor = require("./src/routes/autorRoutes");
 const rutasFavoritos = require("./src/routes/favoritosRoutes");
 const rutasResenas = require("./src/routes/resenasRoutes");
 const rutasComentarios = require("./src/routes/comentarioRoutes");
+const rutasCarrito = require("./src/routes/carritoRoutes");
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/autor", rutasAutor);
 app.use("/favoritos", rutasFavoritos);
 app.use("/resenas", rutasResenas);
 app.use("/comentarios", rutasComentarios);
+app.use("/carrito", rutasCarrito);
 
 app.get("/test-db", async (req, res) => {
   try {

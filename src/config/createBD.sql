@@ -48,14 +48,13 @@ CREATE TABLE ventas (
     fecha_venta TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabla Detalle_venta
-CREATE TABLE Detalle_venta (
-    id_ventas INTEGER REFERENCES ventas(id),
+CREATE TABLE carrito_compras (
+    id SERIAL PRIMARY KEY,
+    id_usuario INTEGER REFERENCES usuarios(id),
     id_libro INTEGER REFERENCES libros(id),
-    cantidad INTEGER,
-    precio_unitario DECIMAL(10,2),
-    PRIMARY KEY (id_ventas, id_libro)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 -- Tabla Pagos
 CREATE TABLE Pago (

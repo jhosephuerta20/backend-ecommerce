@@ -1,4 +1,5 @@
 const Autor = require("../models/autorModel");
+const subirImagen = require("../utils/subirImagen");
 
 const registrar = async (req, res) => {
   const { nombre, url_foto } = req.body;
@@ -7,17 +8,13 @@ const registrar = async (req, res) => {
     if (existente) {
       return res.status(400).json({ error: "El autor ya está registrado" });
     }
-
-    const nuevo = await Autor.registrar(nombre, url_foto);
-
-    res.status(201).json({
-      mensaje: "Autor registrado correctamente",
-      autor: {
-        id: nuevo.id,
-        nombre: nuevo.nombre,
-        url_foto: nuevo.url_foto,
-      },
-    });
+    let url_local = url_foto;
+    if (req.file) {
+      url_local = await subirImagen(req.file.buffer);
+    }
+    const nuevo = await Autor.registrar(nombre, url_local);
+    console.log(nuevo);
+    res.status(201).json(nuevo);
   } catch (error) {
     res
       .status(500)
