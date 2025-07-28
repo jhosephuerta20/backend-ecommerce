@@ -30,12 +30,6 @@ const buscarPorIsbn = async (isbn) => {
   return resultado.rows[0];
 };
 
-const listarLibros = async () => {
-  const query = `SELECT * FROM libros`;
-  const resultado = await pool.query(query);
-  return resultado.rows;
-};
-
 const libroPorId = async (id) => {
   const query = `SELECT * FROM libros WHERE id = $1`;
   const resultado = await pool.query(query, [id]);
@@ -118,13 +112,38 @@ const obtenerCatalogo = async () => {
   return resultado.rows;
 };
 
+//Biblioteca
+const listarBiblioteca = async (id_usuario) => {
+  const query = `
+    SELECT
+  l.id AS libro_id,
+  l.titulo,
+  l.descripcion,
+  l.url_portada,
+  l.url_libro,
+  c.nombreCat AS nombre_categoria,
+  a.nombre AS nombre_autor
+FROM
+  libros l
+JOIN
+  biblioteca b ON l.id = b.id_libro
+JOIN
+  categorias c ON l.id_categoria = c.id
+JOIN
+  autor a ON l.id_autor = a.id
+WHERE
+  b.id_usuario = $1;
+  `;
+  const resultado = await pool.query(query, [id_usuario]);
+  return resultado.rows;
+};
 module.exports = {
   registrar,
   buscarPorIsbn,
-  listarLibros,
   libroPorId,
   actualizarLibro,
   eliminarLibro,
   filtroLibro,
   obtenerCatalogo,
+  listarBiblioteca,
 };

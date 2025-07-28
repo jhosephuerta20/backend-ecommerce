@@ -47,10 +47,20 @@ const vaciarCarrito = async (id_usuario) => {
   await pool.query(query, [id_usuario]);
 };
 
+const verificarLibroEnBiblioteca = async (id_usuario, id_libro) => {
+  const query = `
+    SELECT * FROM biblioteca
+    WHERE id_usuario = $1 AND id_libro = $2
+  `;
+  const resultado = await pool.query(query, [id_usuario, id_libro]);
+  return resultado.rows.length > 0;
+};
+
 module.exports = {
   agregarLibro,
   verificarLibroEnCarrito,
   listarLibrosPorUsuario,
   eliminarLibro,
   vaciarCarrito,
+  verificarLibroEnBiblioteca,
 };

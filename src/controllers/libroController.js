@@ -7,21 +7,17 @@ const registrar = async (req, res) => {
     req.body;
 
   try {
-    // Inicializa con valores opcionales si no se suben archivos
     let local_url = req.body.url_portada || "";
     let libro_local = req.body.url_libro || "";
 
-    // Subir imagen si fue enviada
     if (req.files?.url_portada?.[0]) {
       local_url = await subirImagen(req.files.url_portada[0].buffer);
     }
 
-    // Subir PDF si fue enviado
     if (req.files?.url_libro?.[0]) {
       libro_local = await subirPDF(req.files.url_libro[0].buffer);
     }
 
-    // Verifica si ya existe
     const existente = await Libros.buscarPorIsbn(isbn);
     if (existente) {
       return res.status(409).json({ error: "El libro ya está registrado" });
@@ -45,18 +41,6 @@ const registrar = async (req, res) => {
       error: "Error en el registro",
       detalle: error.message,
     });
-  }
-};
-
-const listarLibros = async (req, res) => {
-  try {
-    resultado = await Libros.listarLibros();
-    res.status(200);
-    res.json({ libros: resultado });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error al listar libros", detalle: error.message });
   }
 };
 
@@ -217,12 +201,25 @@ const catalogo = async (req, res) => {
   }
 };
 
+//Listar biblioteca
+
+const listarLibrosBiblioteca = async (req, res) => {
+  const id_usuario = req.usuarioId;
+  try {
+    const data = await Libros.listarBiblioteca(id_usuario);
+    res.status(200).json({ libros: data });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al listar libros", detalle: error.message });
+  }
+};
 module.exports = {
   registrar,
-  listarLibros,
   obtenerLibro,
   actualizarLibro,
   eliminarLibro,
   filtroLibro,
   catalogo,
+  listarLibrosBiblioteca,
 };

@@ -42,6 +42,10 @@ build/Release
 node_modules/
 jspm_packages/
 
+# Migraciones de bd
+db/
+knexfile.js
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 

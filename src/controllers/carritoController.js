@@ -11,9 +11,13 @@ const agregarAlCarrito = async (req, res) => {
     if (yaExiste) {
       return res.status(400).json({ error: "El libro ya está en el carrito." });
     }
-
-    console.log("yaExyaiste");
-
+    const libroComprado = await CarritoModel.verificarLibroEnBiblioteca(
+      id_usuario,
+      id_libro
+    );
+    if (libroComprado) {
+      return res.status(400).json({ error: "El libro ya en tu biblioteca." });
+    }
     const nuevo = await CarritoModel.agregarLibro(id_usuario, id_libro);
     res.status(201).json({ mensaje: "Libro agregado al carrito", data: nuevo });
   } catch (error) {
@@ -30,17 +34,17 @@ const listarCarrito = async (req, res) => {
     const libros = await CarritoModel.listarLibrosPorUsuario(id_usuario);
 
     // Convertir precios a números y realizar cálculos
-    let subtotal = 0;
-    let totalDescontado = 0;
+    let total = 0;
+    let totalSinIGV = 0;
 
     const librosConDescuento = libros.map((libro) => {
-      const precioNumero = parseFloat(libro.precio);
-      subtotal += precioNumero;
+      const precioConIGV = parseFloat(libro.precio);
+      total += precioConIGV;
 
       // Descuento del 12%
-      const descuento = precioNumero * 0.12;
-      const precioConDescuento = precioNumero - descuento;
-      totalDescontado += precioConDescuento;
+      const descuento = precioConIGV * 0.12;
+      const precioConDescuento = precioConIGV - descuento;
+      totalSinIGV += precioConDescuento;
 
       return {
         ...libro,
@@ -49,10 +53,10 @@ const listarCarrito = async (req, res) => {
     });
 
     // Calcular el IGV (12% del subtotal)
-    const igv = subtotal * 0.12;
+    const igv = total * 0.12;
 
     // El total después del descuento
-    const total = totalDescontado;
+    const subtotal = totalSinIGV;
 
     // Agregar cantidad de libros
     const cantidadLibros = libros.length;

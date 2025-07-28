@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const controlador = require("../controllers/libroController");
 const upload = require("../middlewares/multer");
+const verificarToken = require("../middlewares/verificarToken");
 
 router.post(
   "/crear",
@@ -16,9 +17,12 @@ router.put("/:id", controlador.actualizarLibro);
 router.delete("/:id", controlador.eliminarLibro);
 
 //rutas usuario cliente
-router.get("/listar", controlador.listarLibros);
 router.get("/:id", controlador.obtenerLibro);
-
 router.get("/catalogo/completo", controlador.catalogo);
-
+//Rutas protegidas lista de biblioteca
+router.get(
+  "/listar/biblioteca/:id",
+  verificarToken,
+  controlador.listarLibrosBiblioteca
+);
 module.exports = router;
