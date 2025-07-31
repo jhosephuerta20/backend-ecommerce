@@ -1,8 +1,19 @@
 const express = require("express");
 const router = express.Router();
-const pagoController = require("../controllers/pagoController");
-const verificarToken = require("../middlewares/verificarToken");
+const { procesarVenta } = require("../controllers/pagoController");
+const validarErrores = require("../middlewares/validarErrores");
 
-router.post("/confirmar/:id", verificarToken, pagoController.procesarVenta);
+const {
+  verificarToken,
+  autorizarRoles,
+} = require("../middlewares/verificarToken");
+
+router.post(
+  "/confirmar/:id",
+  validarErrores,
+  verificarToken,
+  autorizarRoles("CLIENTE"),
+  procesarVenta
+);
 
 module.exports = router;

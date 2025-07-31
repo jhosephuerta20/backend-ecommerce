@@ -26,7 +26,7 @@ CREATE TABLE carrito_compras (
 -- Tabla Categorias
 CREATE TABLE categorias (
     id SERIAL PRIMARY KEY,
-    nombreCat VARCHAR (70) NOT NULL
+    nombre_cat VARCHAR (70) NOT NULL
 	created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

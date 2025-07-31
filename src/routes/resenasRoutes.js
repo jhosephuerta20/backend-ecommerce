@@ -1,8 +1,19 @@
 const express = require("express");
 const router = express.Router();
-const controlador = require("../controllers/resenasController");
-const verificarToken = require("../middlewares/verificarToken");
+const { calificar } = require("../controllers/resenasController");
+const validarErrores = require("../middlewares/validarErrores");
 
-router.post("/calificar", verificarToken, controlador.calificar);
+const {
+  verificarToken,
+  autorizarRoles,
+} = require("../middlewares/verificarToken");
+
+router.post(
+  "/calificar",
+  validarErrores,
+  verificarToken,
+  autorizarRoles("CLIENTE"),
+  calificar
+);
 
 module.exports = router;

@@ -34,6 +34,20 @@ const registrar = async (req, res) => {
   }
 };
 
+function generarJWT(usuario) {
+  // Incluye el ID y el rol en el payload
+  const payload = {
+    id: usuario.id,
+    rol: usuario.rol,
+  };
+  console.log("aqui esta", payload);
+
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: "2h",
+  });
+  return token;
+}
+
 const iniciarSesion = async (req, res) => {
   const { correo, contrasena } = req.body;
   try {
@@ -46,12 +60,8 @@ const iniciarSesion = async (req, res) => {
     if (!coincide) {
       return res.status(401).json({ error: "Contraseña incorrecta" });
     }
-
-    const token = jwt.sign({ id: usuario.id }, process.env.JWT_SECRET, {
-      expiresIn: "2h",
-    });
-
-    res.json({ token, id: usuario.id });
+    const token = generarJWT(usuario);
+    res.json({ token });
   } catch (error) {
     res.status(500).json({
       error: "Error al iniciar sesión",
@@ -76,6 +86,7 @@ const obtenerPerfil = async (req, res) => {
 };
 
 module.exports = {
+  generarJWT,
   registrar,
   iniciarSesion,
   obtenerPerfil,

@@ -28,7 +28,7 @@ const listar = async (id_usuario) => {
       'id_autor', l.id_autor,
       'id_categoria', l.id_categoria,
       'autor', json_build_object('nombre', a.nombre),
-      'nombreCat', json_build_object('nombreCat', c.nombreCat)
+      'nombre_cat', json_build_object('nombre_cat', c.nombre_cat)
     ) AS libro
   FROM favoritos f
   JOIN libros l ON f.id_libro = l.id

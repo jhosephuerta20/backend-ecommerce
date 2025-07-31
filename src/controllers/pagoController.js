@@ -86,7 +86,7 @@ const limpiarCarritoDeUsuario = async (id_usuario) => {
 };
 
 const procesarVenta = async (req, res) => {
-  const id_usuario = req.usuarioId;
+  const id_usuario = req.usuario.id;
   const { metodo_pago = "tarjeta" } = req.body;
 
   try {

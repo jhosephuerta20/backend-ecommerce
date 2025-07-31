@@ -1,7 +1,7 @@
 const Favoritos = require("../models/favoritosModel");
 
 const registrar = async (req, res) => {
-  const id_usuario = req.usuarioId;
+  const id_usuario = req.usuario.id;
   const { id_libro } = req.body;
   try {
     // Verifica si ya existe el favorito
@@ -21,7 +21,7 @@ const registrar = async (req, res) => {
 };
 
 const listarFavoritos = async (req, res) => {
-  const id_usuario = req.usuarioId;
+  const id_usuario = req.usuario.id;
   try {
     const listaFavoritos = await Favoritos.listar(id_usuario);
 

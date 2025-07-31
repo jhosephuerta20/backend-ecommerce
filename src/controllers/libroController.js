@@ -204,7 +204,7 @@ const catalogo = async (req, res) => {
 //Listar biblioteca
 
 const listarLibrosBiblioteca = async (req, res) => {
-  const id_usuario = req.usuarioId;
+  const id_usuario = req.usuario.id;
   try {
     const data = await Libros.listarBiblioteca(id_usuario);
     res.status(200).json({ libros: data });

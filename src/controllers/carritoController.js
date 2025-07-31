@@ -1,7 +1,7 @@
 const CarritoModel = require("../models/carritoModel");
 
 const agregarAlCarrito = async (req, res) => {
-  const id_usuario = req.usuarioId;
+  const id_usuario = req.usuario.id;
   const { id_libro } = req.body;
   try {
     const yaExiste = await CarritoModel.verificarLibroEnCarrito(
@@ -28,7 +28,7 @@ const agregarAlCarrito = async (req, res) => {
 };
 
 const listarCarrito = async (req, res) => {
-  const id_usuario = req.usuarioId;
+  const id_usuario = req.usuario.id;
 
   try {
     const libros = await CarritoModel.listarLibrosPorUsuario(id_usuario);
@@ -79,7 +79,7 @@ const listarCarrito = async (req, res) => {
 };
 
 const eliminarLibroDelCarrito = async (req, res) => {
-  const id_usuario = req.usuarioId;
+  const id_usuario = req.usuario.id;
   const { id } = req.params;
   try {
     await CarritoModel.eliminarLibro(id_usuario, id);
@@ -92,7 +92,7 @@ const eliminarLibroDelCarrito = async (req, res) => {
 };
 
 const vaciarCarrito = async (req, res) => {
-  const id_usuario = req.usuarioId;
+  const id_usuario = req.usuario.id;
   try {
     await CarritoModel.vaciarCarrito(id_usuario);
     res.status(200).json({ mensaje: "Carrito vaciado exitosamente" });

@@ -1,8 +1,19 @@
 const express = require("express");
 const router = express.Router();
-const controlador = require("../controllers/libroController");
+const validarErrores = require("../middlewares/validarErrores");
+const {
+  registrar,
+  actualizarLibro,
+  eliminarLibro,
+  obtenerLibro,
+  catalogo,
+  listarLibrosBiblioteca,
+} = require("../controllers/libroController");
 const upload = require("../middlewares/multer");
-const verificarToken = require("../middlewares/verificarToken");
+const {
+  verificarToken,
+  autorizarRoles,
+} = require("../middlewares/verificarToken");
 
 router.post(
   "/crear",
@@ -10,19 +21,37 @@ router.post(
     { name: "url_portada", maxCount: 1 },
     { name: "url_libro", maxCount: 1 },
   ]),
-  controlador.registrar
+  validarErrores,
+  verificarToken,
+  autorizarRoles("ADMIN"),
+  registrar
 );
 
-router.put("/:id", controlador.actualizarLibro);
-router.delete("/:id", controlador.eliminarLibro);
+router.put(
+  "/:id",
+  validarErrores,
+  verificarToken,
+  autorizarRoles("ADMIN"),
+  actualizarLibro
+);
+router.delete(
+  "/:id",
+  validarErrores,
+  verificarToken,
+  autorizarRoles("ADMIN"),
+  eliminarLibro
+);
 
-//rutas usuario cliente
-router.get("/:id", controlador.obtenerLibro);
-router.get("/catalogo/completo", controlador.catalogo);
+//rutas usuario CLIENTE
+router.get("/:id", validarErrores, obtenerLibro);
+router.get("/catalogo/completo", validarErrores, catalogo);
+
 //Rutas protegidas lista de biblioteca
 router.get(
   "/listar/biblioteca/:id",
+  validarErrores,
   verificarToken,
-  controlador.listarLibrosBiblioteca
+  autorizarRoles("CLIENTE"),
+  listarLibrosBiblioteca
 );
 module.exports = router;

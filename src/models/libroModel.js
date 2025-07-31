@@ -85,7 +85,7 @@ const obtenerCatalogo = async () => {
       l.url_portada,
       l.url_libro,
       l.id_categoria,
-      c.nombreCat AS nombre_categoria,
+      c.nombre_cat AS nombre_categoria,
       l.id_autor,
       a.nombre AS nombre_autor,
 
@@ -121,7 +121,7 @@ const listarBiblioteca = async (id_usuario) => {
   l.descripcion,
   l.url_portada,
   l.url_libro,
-  c.nombreCat AS nombre_categoria,
+  c.nombre_cat AS nombre_categoria,
   a.nombre AS nombre_autor
 FROM
   libros l

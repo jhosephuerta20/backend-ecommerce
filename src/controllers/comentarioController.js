@@ -1,7 +1,7 @@
 const Comentario = require("../models/comentarioModel");
 
 const comentar = async (req, res) => {
-  const id_usuario = req.usuarioId;
+  const id_usuario = req.usuario.id;
   const { id_libro } = req.params;
   const { comentario } = req.body;
 

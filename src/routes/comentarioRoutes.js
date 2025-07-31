@@ -1,12 +1,19 @@
 const express = require("express");
 const router = express.Router();
-const controlador = require("../controllers/comentarioController");
-const verificarToken = require("../middlewares/verificarToken");
+const { comentar } = require("../controllers/comentarioController");
+const validarErrores = require("../middlewares/validarErrores");
+
+const {
+  verificarToken,
+  autorizarRoles,
+} = require("../middlewares/verificarToken");
 
 router.post(
   "/crear/:id_libro/:id_usuario",
+  validarErrores,
   verificarToken,
-  controlador.comentar
+  autorizarRoles("CLIENTE"),
+  comentar
 );
 
 module.exports = router;
