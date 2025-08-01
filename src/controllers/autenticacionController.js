@@ -61,7 +61,7 @@ const iniciarSesion = async (req, res) => {
       return res.status(401).json({ error: "Contraseña incorrecta" });
     }
     const token = generarJWT(usuario);
-    res.json({ token, id: usuario.id });
+    res.json({ token, rol: usuario.rol, id: usuario.id });
   } catch (error) {
     res.status(500).json({
       error: "Error al iniciar sesión",
