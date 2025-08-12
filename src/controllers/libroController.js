@@ -46,18 +46,58 @@ const registrar = async (req, res) => {
 
 const obtenerLibro = async (req, res) => {
   const { id } = req.params;
+
   try {
-    resultado = await Libros.libroPorId(id);
-    if (!resultado) {
-      res.json({ resultado: "Libro no registrado" });
-    } else {
-      res.status(200);
-      res.json({ libro: resultado });
+    const data = await Libros.libroPorId(id);
+    if (data.length === 0) {
+      return res.status(404).json({ resultado: "Libro no registrado" });
     }
+    const primerFila = data[0];
+    const libro = {
+      id: primerFila.libro_id,
+      titulo: primerFila.titulo,
+      descripcion: primerFila.descripcion,
+      precio: primerFila.precio,
+      url_portada: primerFila.url_portada,
+      url_libro: primerFila.url_libro,
+      categoria: primerFila.nombre_categoria,
+      autor: primerFila.nombre_autor,
+      resenas: [],
+      comentarios: [],
+    };
+
+    for (const row of data) {
+      if (row.resena_id && !libro.resenas.some((r) => r.id === row.resena_id)) {
+        libro.resenas.push({
+          id: row.resena_id,
+          calificacion: row.calificacion,
+          usuario: {
+            id: row.resena_usuario_id,
+            nombre: row.nombre_usuario_resena,
+          },
+        });
+      }
+      if (
+        row.comentario_id &&
+        !libro.comentarios.some((c) => c.id === row.comentario_id)
+      ) {
+        libro.comentarios.push({
+          id: row.comentario_id,
+          comentario: row.comentario,
+          usuario: {
+            id: row.comentario_usuario_id,
+            nombre: row.nombre_usuario_comentario,
+          },
+        });
+      }
+    }
+    res.status(200).json({ libro: libro });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error al buscar libro", detalle: error.message });
+    console.error("Error al buscar libro:", error);
+    res.status(500).json({
+      error: "Error al buscar libro",
+      detalle: error.message,
+    });
   }
 };
 
