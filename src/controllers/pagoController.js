@@ -18,18 +18,55 @@ const obtenerCarritoYCalcularTotales = async (id_usuario) => {
   return { carrito, total, subtotal, igv };
 };
 
-const crearIntencionDePagoStripe = async (total, id_usuario, carrito) => {
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: Math.round(total * 100),
-    currency: "PEN",
-    metadata: {
-      id_usuario: id_usuario,
-      carrito: JSON.stringify(
-        carrito.map((libro) => ({ id_libro: libro.id_libro }))
-      ),
-    },
-  });
-  return paymentIntent;
+// const crearIntencionDePagoStripe = async (total, id_usuario, carrito) => {
+//   const paymentIntent = await stripe.paymentIntents.create({
+//     amount: Math.round(total * 100),
+//     currency: "PEN",
+//     metadata: {
+//       id_usuario: id_usuario,
+//       carrito: JSON.stringify(
+//         carrito.map((libro) => ({ id_libro: libro.id_libro }))
+//       ),
+//     },
+//   });
+//   return paymentIntent;
+// };
+
+const crearIntentoDePago = async (req, res) => {
+  const id_usuario = req.usuario.id;
+
+  try {
+    const datos_carrito = await obtenerCarritoYCalcularTotales(id_usuario);
+    console.log("Datos del carrito calculados:", datos_carrito);
+
+    if (!datos_carrito || !datos_carrito.total || !datos_carrito.carrito) {
+      return res.status(400).json({
+        error: "Error: No se pudo obtener el carrito o el total a pagar.",
+      });
+    }
+
+    const total_a_pagar_en_centavos = Math.round(datos_carrito.total * 100);
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: total_a_pagar_en_centavos,
+      currency: "PEN",
+      metadata: {
+        id_usuario: id_usuario,
+        carrito: JSON.stringify(
+          datos_carrito.carrito.map((libro) => ({ id_libro: libro.id_libro }))
+        ),
+      },
+    });
+
+    console.log("Payment Intent creado:", paymentIntent);
+
+    res.json({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    res.status(500).json({
+      error: "Error creando el intento de pago",
+      detalle: error.message,
+    });
+  }
 };
 
 const crearRegistroDeVenta = async (
@@ -90,14 +127,14 @@ const procesarVenta = async (req, res) => {
   const { metodo_pago = "tarjeta" } = req.body;
 
   try {
-    const { carrito, total, subtotal, igv } =
+    /*  const { carrito, total, subtotal, igv } =
       await obtenerCarritoYCalcularTotales(id_usuario);
 
     const paymentIntent = await crearIntencionDePagoStripe(
       total,
       id_usuario,
       carrito
-    );
+    );*/
 
     const venta = await crearRegistroDeVenta(
       id_usuario,
@@ -125,4 +162,7 @@ const procesarVenta = async (req, res) => {
   }
 };
 
-module.exports = { procesarVenta };
+module.exports = {
+  crearIntentoDePago,
+  procesarVenta,
+};
