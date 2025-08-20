@@ -125,6 +125,13 @@ const procesarVenta = async (
   metodo_pago = "tarjeta"
 ) => {
   try {
+    const { carrito, total, subtotal, igv } =
+      await obtenerCarritoYCalcularTotales(id_usuario);
+
+    if (!carrito || carrito.length === 0) {
+      throw new Error("El carrito está vacío");
+    }
+
     const venta = await crearRegistroDeVenta(
       id_usuario,
       carrito.length,
@@ -145,7 +152,7 @@ const procesarVenta = async (
   }
 };
 
-const webHook = async (req, res) => {
+/*const webHook = async (req, res) => {
   let event;
   try {
     const sig = req.headers["stripe-signature"];
@@ -160,13 +167,59 @@ const webHook = async (req, res) => {
   }
   if (event.type === "payment_intent.succeeded") {
     const paymentIntent = event.data.object;
-
+    // console.log(`✅ Pago confirmado: ${paymentIntent.id}`);
+    // console.log("Metadata:", paymentIntent.metadata);
     const id_usuario = paymentIntent.metadata.id_usuario;
     try {
       await procesarVenta(id_usuario, paymentIntent);
+      console.log("🎯 Venta procesada para usuario:", id_usuario);
+      console.log("Detalles del pago:", paymentIntent);
+
+      console.log("🎯 Venta procesada para usuario:", id_usuario);
     } catch (err) {
-      console.error("Error procesando venta:", err.message);
+      console.error("❌ Error procesando venta:", err.message);
     }
+  }
+
+  res.json({ received: true });
+};*/
+const webHook = async (req, res) => {
+  let event;
+  try {
+    const sig = req.headers["stripe-signature"];
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+
+    console.log("=== 🚀 EVENTO COMPLETO ===");
+    console.log(JSON.stringify(event, null, 2));
+  } catch (err) {
+    console.error("❌ Error validando webhook:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === "payment_intent.succeeded") {
+    const paymentIntent = event.data.object;
+
+    console.log(`✅ Pago confirmado: ${paymentIntent.id}`);
+    console.log(
+      "🔎 Metadata completa:",
+      JSON.stringify(paymentIntent.metadata, null, 2)
+    );
+
+    const id_usuario = paymentIntent.metadata.id_usuario; // 👈 cuidado: es id_usuario, no user_id
+    console.log("🏷️ Usuario:", id_usuario);
+
+    try {
+      await procesarVenta(id_usuario, paymentIntent);
+      console.log("🎯 Venta procesada para usuario:", id_usuario);
+    } catch (err) {
+      console.error("❌ Error procesando venta:", err.message);
+    }
+  } else {
+    console.log("ℹ️ Evento no manejado:", event.type);
   }
 
   res.json({ received: true });
