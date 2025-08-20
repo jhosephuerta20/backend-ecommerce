@@ -37,8 +37,6 @@ const crearIntentoDePago = async (req, res) => {
 
   try {
     const datos_carrito = await obtenerCarritoYCalcularTotales(id_usuario);
-    console.log("Datos del carrito calculados:", datos_carrito);
-
     if (!datos_carrito || !datos_carrito.total || !datos_carrito.carrito) {
       return res.status(400).json({
         error: "Error: No se pudo obtener el carrito o el total a pagar.",
@@ -57,8 +55,6 @@ const crearIntentoDePago = async (req, res) => {
         ),
       },
     });
-
-    console.log("Payment Intent creado:", paymentIntent);
 
     res.json({ clientSecret: paymentIntent.client_secret });
   } catch (error) {
@@ -122,20 +118,13 @@ const limpiarCarritoDeUsuario = async (id_usuario) => {
   await CarritoModel.vaciarCarrito(id_usuario);
 };
 
-const procesarVenta = async (req, res) => {
-  const id_usuario = req.usuario.id;
-  const { metodo_pago = "tarjeta" } = req.body;
-
+// ✅ Lógica pura de negocio (no depende de req ni res)
+const procesarVenta = async (
+  id_usuario,
+  paymentIntent,
+  metodo_pago = "tarjeta"
+) => {
   try {
-    /*  const { carrito, total, subtotal, igv } =
-      await obtenerCarritoYCalcularTotales(id_usuario);
-
-    const paymentIntent = await crearIntencionDePagoStripe(
-      total,
-      id_usuario,
-      carrito
-    );*/
-
     const venta = await crearRegistroDeVenta(
       id_usuario,
       carrito.length,
@@ -143,26 +132,48 @@ const procesarVenta = async (req, res) => {
       subtotal,
       igv
     );
+
     await insertarDetallesDeVenta(venta.id, carrito);
     await agregarLibrosABiblioteca(id_usuario, carrito);
     await registrarInformacionDePago(venta.id, metodo_pago, paymentIntent);
     await limpiarCarritoDeUsuario(id_usuario);
-    res
-      .status(200)
-      .json({ mensaje: "Compra registrada exitosamente", venta_id: venta.id });
+
+    return venta;
   } catch (error) {
-    console.error("Error en procesarVenta:", error.message);
-    let statusCode = 500;
-    if (error.message === "El carrito está vacío") {
-      statusCode = 400;
-    }
-    res
-      .status(statusCode)
-      .json({ error: "Error al procesar la venta", detalle: error.message });
+    console.error("Error en procesarVentaLogic:", error.message);
+    throw error;
   }
+};
+
+const webHook = async (req, res) => {
+  let event;
+  try {
+    const sig = req.headers["stripe-signature"];
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+    //console.log("contenido del event", event);
+  } catch (err) {
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+  if (event.type === "payment_intent.succeeded") {
+    const paymentIntent = event.data.object;
+
+    const id_usuario = paymentIntent.metadata.id_usuario;
+    try {
+      await procesarVenta(id_usuario, paymentIntent);
+    } catch (err) {
+      console.error("Error procesando venta:", err.message);
+    }
+  }
+
+  res.json({ received: true });
 };
 
 module.exports = {
   crearIntentoDePago,
   procesarVenta,
+  webHook,
 };

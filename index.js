@@ -12,10 +12,13 @@ const rutasResenas = require("./src/routes/resenasRoutes");
 const rutasComentarios = require("./src/routes/comentarioRoutes");
 const rutasCarrito = require("./src/routes/carritoRoutes");
 const rutasPago = require("./src/routes/pagoRoutes");
+const stripePago = require("./src/routes/stripeRoutes");
 
 const app = express();
 
 app.use(cors());
+app.use("/pagos/stripe", stripePago);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

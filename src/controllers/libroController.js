@@ -153,7 +153,7 @@ const filtroLibro = async (req, res) => {
   const { titulo } = req.body;
   try {
     const resultado = await Libros.filtroLibro(titulo);
-    res.json(libro);
+    res.json(resultado);
   } catch (error) {}
 };
 
